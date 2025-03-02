@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Chapters for Batch <%= batch_name %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 20px;
+        }
+        
+        .grid-item {
+            background: #ffffff;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .grid-item h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 16px;
+        }
+        
+        .info-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            color: #4a5568;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            gap: 8px;
+        }
+        
+        .button:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .button:focus {
+            outline: none;
+            ring: 2px;
+            ring-offset: 2px;
+            ring-blue-500;
+        }
+        
+        .loader-container {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .loader-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            position: absolute;
+            color: white;
+            font-size: 1.125rem;
+            margin-top: 80px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+            
+            .grid-item {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">
+            Chapters of <%= subject_name %> in <%= batch_name %>
+        </h1>
+        
+        <div class="grid">
+            <% chapters.forEach(function(chapter) { %>
+                <div class="grid-item">
+                    <h2><%= chapter.chapter_name %></h2>
+                    <div class="info-container">
+                        <div class="info-item">
+                            <i class="far fa-file-alt text-gray-600"></i>
+                            <span>Total DPP's: <%= chapter.entries_count %></span>
+                        </div>
+                    </div>
+                    <button 
+                        class="button"
+                        onclick="openChapter('<%= batch_id %>','<%= batch_name %>','<%= subject_slug %>','<%= chapter.chapter_name %>')"
+                    >
+                        <i class="fas fa-folder-open"></i>
+                        Open
+                    </button>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <div class="loader-container">
+        <div class="loader"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-4DEm5V5Sv5T1+q2K1D9meFRze+Rvk8Mx3ad+qP1LkpwNwo8rE0Ad0AsPw6Ae+Rr40NmtcFzJY+6xR0Iq7zIqVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        function showLoader() {
+            const loader = document.querySelector('.loader-container');
+            loader.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLoader() {
+            const loader = document.querySelector('.loader-container');
+            loader.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+
+
+
+function openChapter(batchId, batchName, subjectSlug, chapterName) {
+            showLoader();
+            setTimeout(function() {
+                window.location.href = '/dpp_chp_entries/' + batchId + '/' + batchName + '/' + subjectSlug + '/' + chapterName;hideLoader();
+            }, 300);
+        }
+    </script>
+</body>
+</html>

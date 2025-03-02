@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPP's of <%= chapter_name %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #e9ecef;
+            color: #343a40;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #007bff;
+        }
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .grid-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            flex: 1 1 calc(33.333% - 40px);
+            box-sizing: border-box;
+            transition: box-shadow 0.3s, transform 0.3s;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .grid-item h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .grid-item p {
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 0.9rem;
+            margin: 8px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .icon {
+            margin-right: 5px;
+        }
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            position: absolute;
+            top: calc(50% + 40px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        body.loading {
+ overflow: hidden;
+        }
+        body.loading > *:not(.loader-container) {
+            filter: blur(5px);
+        }
+        
+        .info-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .info-item i {
+            margin-right: 5px;
+            color: #007bff;
+        }
+
+        @media (max-width: 768px) {
+            .grid-item {
+                flex: 1 1 calc(100% - 40px);
+            }
+            .info-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>DPP's of <%= chapter_name %> in <%= subject_name %></h1>
+        <div class="grid">
+            <% entries.forEach(function(entry) { %>
+                <div class="grid-item">
+                    <h2><%= entry.test_name %></h2>
+                    <div class="info-container">
+                        <div class="info-item">
+                            <i class="fas fa-question-circle icon"></i>
+                            <span>Questions: <%= entry.questions_count %></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="far fa-calendar-alt icon"></i>
+                            <span>Date: <%= entry.test_date %></span>
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <button class="button" onclick="openTest('<%= entry.test_id %>', '<%= batch_id %>', '<%= subject_slug %>')">
+                            <i class="fas fa-play icon"></i>
+                            Start Test
+                        </button>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-4DEm5V5Sv5T1+q2K1D9meFRze+Rvk8Mx3ad+qP1LkpwNwo8rE0Ad0AsPw6Ae+Rr40NmtcFzJY+6xR0Iq7zIqVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        function openTest(testId, batchId, subjectSlug) {
+            const batch_name = '<%= batch_name %>'
+            window.location.href = '/dpp_test/' + batchId + '/' + subjectSlug + '/' + testId + '/' + batch_name;
+        }
+    </script>
+</body>
+</html>

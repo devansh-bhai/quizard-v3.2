@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Statistics Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .graph-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 10px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        .section-grid {
+            display: grid;
+            gap: 20px;
+            padding: 10px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stats-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        .question-count {
+            text-align: center;
+            font-size: 1.2em;
+            color: #2196F3;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .marks-display {
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .marks-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 5px;
+        }
+
+        .marks-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .stat-item {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stat-values {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-number {
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .stat-percentage {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .accuracy-badge {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        @media (min-width: 768px) {
+            .content-wrapper {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+
+            .chart-container {
+                flex: 1;
+                max-width: 50%;
+            }
+
+            .stats-container {
+                flex: 1;
+            }
+
+            .section-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .section-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .graph-container {
+                padding: 15px;
+                margin: 5px auto;
+            }
+
+            .content-wrapper {
+                gap: 15px;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+
+            .stat-values {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .accuracy-badge {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .marks-display {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <% if (locals.overallReport) { %>
+        <div class="graph-container overall-stats">
+            <h2 style="text-align: center; margin-bottom: 15px;">Overall Performance</h2>
+            <div class="question-count">Total Questions: <%= overallReport.totalQuestions %></div>
+            <div class="content-wrapper">
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="overallChart"></canvas>
+                    </div>
+                    <div class="marks-display">
+                        <div class="marks-value"><%= overallReport.totalMarks %></div>
+                        <div class="marks-label">Total Marks</div>
+                    </div>
+                </div>
+                <div class="stats-container" id="overallStats"></div>
+            </div>
+        </div>
+
+        <div class="section-grid">
+            <% if (locals.sections && locals.sections.length > 0) { %>
+                <% sections.forEach((section, index) => { %>
+                    <div class="graph-container">
+                        <h3 style="text-align: center; margin-bottom: 15px;"><%= section.name %> Overview</h3>
+                        <div class="question-count">Total Questions: <%= section.total_ques %></div>
+                        <div class="content-wrapper">
+                            <div class="chart-container">
+                                <div class="chart-wrapper">
+                                    <canvas id="sectionChart<%= index %>"></canvas>
+                                </div>
+                                <div class="marks-display">
+                                    <div class="marks-value"><%= section.marks %></div>
+                                    <div class="marks-label">Total Marks</div>
+                                </div>
+                            </div>
+                            <div class="stats-container" id="sectionStats<%= index %>"></div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+
+        <script>
+            function createDoughnutChart(ctx, data) {
+                return new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Correct', 'Wrong', 'Skipped'],
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#4CAF50', '#f44336', '#9e9e9e'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    font: {
+                                        size: window.innerWidth < 768 ? 12 : 14
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+
+            function createStatsDisplay(container, stats, showAccuracy = false) {
+                const statsDiv = document.getElementById(container);
+                statsDiv.innerHTML = '';
+
+                if (showAccuracy) {
+                    const accuracyBadge = document.createElement('div');
+                    accuracyBadge.className = 'accuracy-badge';
+                    accuracyBadge.innerHTML = `Accuracy: ${Math.round(overallReport.accuracy)}%`;
+                    statsDiv.appendChild(accuracyBadge);
+                }
+
+                stats.forEach(stat => {
+                    const statDiv = document.createElement('div');
+                    statDiv.className = 'stat-item';
+                    statDiv.innerHTML = `
+                        <div class="stat-header">
+                            <span class="stat-label">${stat.label}</span>
+                            <div class="stat-values">
+                                <span class="stat-number">${stat.value}</span>
+                                <span class="stat-percentage">(${Math.round(stat.percentage)}%)</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${stat.percentage}%; background-color: ${stat.color};"></div>
+                        </div>
+                    `;
+                    statsDiv.appendChild(statDiv);
+                });
+            }
+
+            // Initialize visualizations
+            const overallReport = <%- JSON.stringify(locals.overallReport) %>;
+            const sections = <%- JSON.stringify(locals.sections) %>;
+
+            // Create overall chart
+            const overallCtx = document.getElementById('overallChart').getContext('2d');
+            createDoughnutChart(overallCtx, [
+                overallReport.right,
+                overallReport.wrong,
+                overallReport.skipped
+            ]);
+
+            // Create overall stats
+            const overallStats = [
+                {
+                    label: 'Correct Answers',
+                    value: overallReport.right,
+                    percentage: (overallReport.right / overallReport.totalQuestions) * 100,
+                    color: '#4CAF50'
+                },
+                {
+                    label: 'Wrong Answers',
+                    value: overallReport.wrong,
+                    percentage: (overallReport.wrong / overallReport.totalQuestions) * 100,
+                    color: '#f44336'
+                },
+                {
+                    label: 'Skipped Questions',
+                    value: overallReport.skipped,
+                    percentage: (overallReport.skipped / overallReport.totalQuestions) * 100,
+                    color: '#9e9e9e'
+                }
+            ];
+            createStatsDisplay('overallStats', overallStats, true);
+
+            // Create section visualizations
+            if (sections && sections.length > 0) {
+                sections.forEach((section, index) => {
+                    const sectionCtx = document.getElementById(`sectionChart${index}`).getContext('2d');
+                    createDoughnutChart(sectionCtx, [
+                        section.correct_ques,
+                        section.wrong_ques,
+                        section.skipped_ques
+                    ]);
+
+                    const sectionStats = [
+                        {
+                            label: 'Correct Answers',
+                            value: section.correct_ques,
+                            percentage: (section.correct_ques / section.total_ques) * 100,
+                            color: '#4CAF50'
+                        },
+                        {
+                            label: 'Wrong Answers',
+                            value: section.wrong_ques,
+                            percentage: (section.wrong_ques / section.total_ques) * 100,
+                            color: '#f44336'
+                        },
+                        {
+                            label: 'Skipped Questions',
+                            value: section.skipped_ques,
+                            percentage: (section.skipped_ques / section.total_ques) * 100,
+                            color: '#9e9e9e'
+                        }
+                    ];
+                    createStatsDisplay(`sectionStats${index}`, sectionStats, false);
+                });
+            }
+
+            // Handle window resizing
+            window.addEventListener('resize', function() {
+                const charts = document.querySelectorAll('canvas');
+                charts.forEach(canvas => {
+                    const chart = Chart.getChart(canvas);
+                    if (chart) {
+                        chart.options.plugins.legend.labels.font.size = window.innerWidth < 768 ? 12 : 14;
+                        chart.update();
+                    }
+                });
+            });
+        </script>
+    <% } else { %>
+        <div class="graph-container">
+            <div class="no-data">
+                No statistics available. Please submit data using the POST endpoint.
+            </div>
+        </div>
+    <% } %>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Modern Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-in-right': 'slideInRight 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 3s ease infinite',
+                        'typing': 'typing 3.5s steps(40, end)',
+                        'blink': 'blink .75s step-end infinite',
+                        'spin-once': 'spin 0.5s linear'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        gradient: {
+                            '0%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                            '100%': { backgroundPosition: '0% 50%' }
+                        },
+                        typing: {
+                            'from': { width: '0' },
+                            'to': { width: '100%' }
+                        },
+                        blink: {
+                            'from, to': { borderColor: 'transparent' },
+                            '50%': { borderColor: 'white' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .typing-animation {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white }
+        }
+
+        .loading-animation {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .loading-bar {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -50% }
+            100% { left: 100% }
+        }
+
+        .shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .login-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease-out, height 0.6s ease-out;
+        }
+
+        .login-btn.clicked::after {
+            width: 300%;
+            height: 300%;
+        }
+
+        .login-btn .button-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            animation: rotate 1s linear infinite;
+        }
+
+        .success-checkmark {
+            animation: checkmark 0.4s ease-in-out forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        @keyframes checkmark {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Welcome Text -->
+        <div class="text-center mb-8">
+            <div class="typing-animation inline-block">
+                <h1 class="text-3xl font-bold text-white" id="typing-text">Welcome to Quizard</h1>
+            </div>
+        </div>
+
+        <!-- Login Container -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-semibold text-white">Login</h2>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-6" action="/login" method="POST">
+                <!-- Username/Email Input -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-white/90">Username or Email</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        class="mt-1 block w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Enter your username or email"
+                    >
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-white/90">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        class="mt-1 block w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Enter your password"
+                    >
+                </div>
+
+                <!-- Loading Animation (Hidden by default) -->
+                <div id="loadingAnimation" class="loading-animation hidden">
+                    <div class="loading-bar"></div>
+                </div>
+
+                <!-- Error Message (Hidden by default) -->
+                <div id="errorMessage" class="hidden">
+                    <p class="text-red-300 text-sm text-center"></p>
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                    type="submit"
+                    class="login-btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium py-3 px-4 rounded-lg hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 animate-gradient bg-[length:200%_200%]"
+                >
+                    <span class="button-content">
+                        <span class="button-text">Login</span>
+                        <svg class="spinner hidden w-5 h-5" viewBox="0 0 24 24" fill="none">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <svg class="success-checkmark hidden w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            const loadingAnimation = document.getElementById('loadingAnimation');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginContainer = document.querySelector('.bg-white\\/10');
+            const loginButton = form.querySelector('button[type="submit"]');
+            const buttonText = loginButton.querySelector('.button-text');
+            const spinner = loginButton.querySelector('.spinner');
+            const checkmark = loginButton.querySelector('.success-checkmark');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Reset previous error states
+                errorMessage.classList.add('hidden');
+                loginContainer.classList.remove('shake');
+                
+                // Button click animation
+                loginButton.classList.add('clicked');
+                buttonText.textContent = 'Logging in...';
+                spinner.classList.remove('hidden');
+                checkmark.classList.add('hidden');
+                
+                // Show loading animation
+                loadingAnimation.classList.remove('hidden');
+                
+                const formData = {
+                    username: form.username.value,
+                    password: form.password.value
+                };
+
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        // Success animation
+                        spinner.classList.add('hidden');
+                        checkmark.classList.remove('hidden');
+                        buttonText.textContent = 'Success!';
+                        
+                        // Redirect after success animation
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1000);
+                    } else {
+                        // Handle error
+                        const data = await response.json();
+                        throw new Error(data.message || 'Invalid username or password');
+                    }
+                } catch (error) {
+                    // Reset button state
+                    loginButton.classList.remove('clicked');
+                    buttonText.textContent = 'Login';
+                    spinner.classList.add('hidden');
+                    
+                    // Hide loading animation
+                    loadingAnimation.classList.add('hidden');
+                    
+                    // Show error message
+                    errorMessage.classList.remove('hidden');
+                    errorMessage.querySelector('p').textContent = error.message;
+                    
+                    // Add shake animation
+                    loginContainer.classList.add('shake');
+                    
+                    // Reset form fields
+                    form.password.value = '';
+                    
+                    // Add error styles to inputs
+                    form.username.classList.add('border-red-500');
+                    form.password.classList.add('border-red-500');
+                    
+                    // Remove error styles after animation
+                    setTimeout(() => {
+                        form.username.classList.remove('border-red-500');
+                        form.password.classList.remove('border-red-500');
+                    }, 820);
+                }
+            });
+
+            // Reset button animation when it ends
+            loginButton.addEventListener('animationend', () => {
+                loginButton.classList.remove('clicked');
+            });
+
+            // Typing animation for welcome text
+            const text = "Welcome to Quizard";
+            const typingText = document.getElementById('typing-text');
+            let index = 0;
+            let forward = true;
+
+            function type() {
+                if (forward) {
+                    typingText.innerText = text.slice(0, index++);
+                    typingText.style.borderRight = '.15em solid white';
+                    
+                    if (index > text.length) {
+                        forward = false;
+                        setTimeout(type, 500);
+                    } else {
+                        setTimeout(type, 100);
+                    }
+                } else {
+                    typingText.innerText = text.slice(0, --index);
+                    typingText.style.borderRight = 'none';
+                    
+                    if (index === 0) {
+                        forward = true;
+                        setTimeout(type, 200);
+                    } else {
+                        setTimeout(type, 50);
+                    }
+                }
+            }
+
+            type();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizard - Exam Preparation Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+    scroll-behavior: smooth;
+}
+        
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f4f6f7;
+            --text-color: #2c3e50;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            justify-content: center;
+            transform: translateZ(20px);
+            transition: all 0.3s ease;
+            
+
+        }
+      
+        .head-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .logo {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -2px;
+}
+
+.logo span {
+    /* background: linear-gradient(-45deg, #0088cc, #2575fc, #6a11cb, var(--secondary-color));
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; */
+    color: #f69608;
+    display: inline-block;
+}
+        /* Mobile Menu Styles */
+        
+        .mobile-menu-toggle {
+            display: none;
+            position: relative;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .mobile-menu-toggle i {
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .mobile-menu-dot {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            display: none;
+        }
+
+      
+        .mobile-dropdown a {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-dropdown a i {
+            margin-right: 10px;
+        }
+
+        .mobile-dropdown a:hover {
+            background-color: var(--background-color);
+        }
+
+/* popup of adds  */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-sizing: border-box;
+    overflow-y: auto; /* Enable scrolling inside the popup */
+    max-height: 90vh; /* Limit height to viewport */
+}
+
+.popup h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+.popup button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    max-width: 200px;
+}
+
+.popup button:hover {
+    background-color: darken(var(--primary-color), 10%);
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 999;
+}
+
+body.no-scroll {
+    overflow: hidden; /* Prevent scrolling on the background */
+}
+
+@media (min-width: 768px) {
+    .popup {
+        width: 70%;
+        max-width: 400px;
+    }
+
+    .popup button {
+        max-width: 150px;
+    }
+}
+        /* Ensure desktop navigation is visible by default */
+        .desktop-nav-items {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 768px) {
+            .desktop-nav-items {
+                display: none !important;
+            }
+
+            .nav-content {
+                position: relative;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-menu-dot {
+                display: block;
+            }
+
+            .search-container {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .mobile-dropdown {
+                width: calc(100% - 30px);
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+            }
+        }
+        /* Animated Gradient Background */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header {
+            background: linear-gradient(-45deg, var(--primary-color), var(--secondary-color), #6a11cb, #2575fc);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 768px) {
+            .nav-content {
+                position: relative;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-menu-dot {
+                display: block;
+            }
+
+            .search-container {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .mobile-dropdown {
+                width: 200px;
+            }
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+        }
+
+      
+
+        /* Navigation */
+        nav {
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Categories */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem 0;
+            cursor: pointer;
+            transform: translateZ(20px);
+            transition: all 0.3s ease;
+        }
+       
+        
+        .category:hover {
+            transform: translateZ(30px) scale(1.05);
+        }
+
+    
+
+        .category-content.expanded {
+            max-height: 1000px;
+        }
+
+
+
+/* Smoother category card animations */
+/* Update the category-card style */
+.category-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1rem;
+    max-height: 400px; /* Set a fixed height */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Style the scrollbar */
+.category-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.category-card::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.category-card::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.category-card::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+/* For Firefox */
+.category-card {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) #f1f1f1;
+}
+/* Smoother category content expansion */
+.category-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smoother mobile menu transitions */
+.mobile-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 200;
+    min-width: 200px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-dropdown.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Smoother search results animation */
+#search-results {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#search-results.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+        .category-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .category-toggle {
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .category-content.expanded {
+            max-height: 1000px;
+        } */
+
+        .batch-list {
+            list-style: none;
+        }
+
+        /* Update the batch-item style */
+.batch-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    background-color: var(--background-color);
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.batch-item:hover {
+    background-color: #e9ecef;
+    transform: translateX(5px);
+}
+
+/* Update the batch-link style */
+.batch-link {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 0.75rem;
+    flex-grow: 1;
+    display: block;
+}
+
+/* Update the favorite-icon style */
+.favorite-icon {
+    color: #ffc107;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0.75rem;
+    position: relative;
+    z-index: 2;
+}
+        .favorite-icon:hover {
+            color: #ff9800;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--text-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        
+
+        /* Additional Styles */
+        .telegram-float {
+            position: sticky;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1000;
+            float: right;
+        }
+        .telegram-float p {
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transform: perspective(1000px) rotateX(10deg);
+            transition: transform 0.3s ease;
+        }
+        .telegram-float p:hover {
+            transform: perspective(1000px) rotateX(0deg) scale(1.05);
+        }
+        .telegram-float p span {
+            display: inline-block;
+            animation: wave 1s infinite;
+            animation-delay: calc(0.1s * var(--i));
+            color: #0088cc;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        .telegram-float a {
+            background-color: #0088cc;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .telegram-float a:hover {
+            transform: translateY(-5px);
+        }
+        .telegram-float a svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+        @keyframes wave {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        @media (max-width: 768px) {
+            .telegram-float {
+                bottom: 10px;
+                right: 10px;
+            }
+            .telegram-float p {
+                font-size: 16px;
+                padding: 8px 12px;
+            }
+            .telegram-float a {
+                width: 50px;
+                height: 50px;
+            }
+            .telegram-float a svg {
+                width: 25px;
+                height: 25px;
+            }
+        }
+
+
+        /* search result  */
+        
+  
+
+#search-results h3 {
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.search-results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.search-result-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-link {
+    text-decoration: none;
+    display: block;
+    padding: 12px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.search-result-link:hover {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.search-result-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.batch-name {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.search-result-category {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+#no-results {
+    text-align: center;
+    color: #999;
+    margin-top: 16px;
+}
+
+#no-results h3 {
+    font-size: 1.2rem;
+}
+
+#no-results p {
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+        #search-results h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        #search-results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #search-results li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        #search-results li:hover {
+            background-color: #e9e9e9;
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="head-container">
+            <h1 class="logo"><span>Q</span>uizard</h1>
+            <p>Your Ultimate Exam Preparation Platform</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container nav-content">
+            <div class="nav-links">
+               
+                
+                <!-- Desktop Navigation Items -->
+                <div class="desktop-nav-items">
+                    <a href="/test-series" class="flex items-center gap-2 font-medium hover:text-blue-600 text-gray-700">
+                        <i class="fas fa-book"></i>
+                        Test Series
+                        <sup style="color: red;padding-left: 5px;"> NEW</sup>
+                    </a>
+                    <a href="/dpp"><i class="fas fa-book"></i> DPP's </a>
+                <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu Toggle -->
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+                <span class="mobile-menu-dot"></span>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div id="mobile-dropdown" class="mobile-dropdown">
+                <!-- <a href="#"><i class="fas fa-home"></i> Home</a> -->
+                <a href="/test-series" class="flex items-center gap-2 font-medium hover:text-blue-600 text-gray-700">
+                    <i class="fas fa-book"></i>
+                    Test Series
+                    <sup style="color: red;padding-left: 5px;"> NEW</sup>
+                </a>
+                <a href="/dpp"><i class="fas fa-book"></i> DPP's </a>
+                <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+            </div>
+
+            <div class="search-container">
+                <input type="text" placeholder="Search batches..." class="search-input" id="batch-search">
+            </div>
+        </div>
+    </nav>
+
+    <div id="search-results"></div>
+
+    <main class="container">
+        <div class="categories">
+            <% if (type == "batch_test") { %>    
+            <div class="category-card" id="boards">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <h2 class="category-title">Boards Level Tests</h2>
+                    <i class="fas fa-chevron-down category-toggle"></i>
+                </div>
+                <div class="category-content">
+                    <h3>For 10th</h3>
+                    <ul class="batch-list">
+                        <% if (categorizedBatches['boards'] && categorizedBatches['boards']['10']) { %>
+                            <% categorizedBatches['boards']['10'].forEach(batch => { %>
+                                <li class="batch-item">
+                                    <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                   <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                </li>
+                            <% }) %>
+                        <% } %>
+                    </ul>
+                
+                    <h3>For 12th</h3>
+                    <ul class="batch-list">
+                        <% if (categorizedBatches['boards'] && categorizedBatches['boards']['12']) { %>
+                            <% categorizedBatches['boards']['12'].forEach(batch => { %>
+                                <li class="batch-item">
+                                    <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                   <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                </li>
+                            <% }) %>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="category-card" id="jee">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <h2 class="category-title">JEE Tests</h2>
+                    <i class="fas fa-chevron-down category-toggle" ></i>
+                </div>
+                <div class="category-content">
+                    <h3>For 11<sup>th</sup></h3>
+                    <ul class="batch-list">
+                        <% if (categorizedBatches['jee'] && categorizedBatches['jee']['11']) { %>
+                            <% categorizedBatches['jee']['11'].forEach(batch => { %>
+                                <li class="batch-item">
+                                    <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                   <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                </li>
+                            <% }) %>
+                        <% } %>
+                    </ul>
+                    <h3>For 12<sup>th</sup></h3>
+                    <ul class="batch-list">
+                    <% if (categorizedBatches['jee'] && categorizedBatches['jee']['12']) { %>
+                        <% categorizedBatches['jee']['12'].forEach(batch => { %>
+                            <li class="batch-item">
+                                <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                               <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                            </li>
+                        <% }) %>
+                    <% } %>
+                </ul>
+                </div>
+            </div>
+
+
+            <div class="category-card" id="neet">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <h2 class="category-title">NEET Tests</h2>
+                    <i class="fas fa-chevron-down category-toggle"></i>
+                </div>
+                <div class="category-content">
+                    <h3>For 11<sup>th</sup></h3>
+                    <ul class="batch-list">
+                        <% if (categorizedBatches['neet'] && categorizedBatches['neet']['11']) { %>
+                            <% categorizedBatches['neet']['11'].forEach(batch => { %>
+                                <li class="batch-item">
+                                    <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                   <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                </li>
+                            <% }) %>
+                        <% } %>
+                    </ul>
+                    <h3>For 12<sup>th</sup></h3>
+                    <ul class="batch-list">
+                    <% if (categorizedBatches['neet'] && categorizedBatches['neet']['12']) { %>
+                        <% categorizedBatches['neet']['12'].forEach(batch => { %>
+                            <li class="batch-item">
+                                <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                               <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                            </li>
+                        <% }) %>
+                    <% } %>
+                </ul>
+                </div>
+            </div>
+            
+            
+            <div class="category-card" id="dropper">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <h2 class="category-title">DROPPER Tests</h2>
+                    <i class="fas fa-chevron-down category-toggle"></i>
+                </div>
+                <div class="category-content">
+                    <h3>For JEE</h3>
+                    <ul class="batch-list">
+                        <% if (categorizedBatches['dropper'] && categorizedBatches['dropper']['jee']) { %>
+                            <% categorizedBatches['dropper']['jee'].forEach(batch => { %>
+                                <li class="batch-item">
+                                    <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                   <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                </li>
+                            <% }) %>
+                        <% } %>
+                    </ul>
+                    <h3>For NEET</h3>
+                    <ul class="batch-list">
+                    <% if (categorizedBatches['dropper'] && categorizedBatches['dropper']['neet']) { %>
+                        <% categorizedBatches['dropper']['neet'].forEach(batch => { %>
+                            <li class="batch-item">
+                                <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                               <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                            </li>
+                        <% }) %>
+                    <% } %>
+                </ul>
+                </div>
+            </div>
+            <div class="category-card" id="other">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <h2 class="category-title">Other Batch Tests</h2>
+                    <i class="fas fa-chevron-down category-toggle" ></i>
+                </div>
+                <div class="category-content">
+                    
+                    <ul class="batch-list">
+                        <% if (categorizedBatches['other'] && categorizedBatches['other']) { %>
+                            <% categorizedBatches['other'].forEach(batch => { %>
+                                <li class="batch-item">
+                                    <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                   <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                </li>
+                            <% }) %>
+                        <% } %>
+                    </ul>  
+                </div>
+            </div>
+            <% } %>
+            <% if (type = "test_series") { %>
+                <div class="category-card" id="other">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <h2 class="category-title"> Tests Series</h2>
+                        <i class="fas fa-chevron-down category-toggle" ></i>
+                    </div>
+                    <div class="category-content">
+                        
+                        <ul class="batch-list">
+                            <% if (categorizedBatches['other'] && categorizedBatches['other']) { %>
+                                <% categorizedBatches['other'].forEach(batch => { %>
+                                    <li class="batch-item">
+                                        <a href="../batch/<%= batch.batch_id %>/<%= batch.batch_name %>/<%= type %>" class="batch-link"><%= batch.batch_name %></a>
+                                       <% if (isLoggedIn) { %>     <i class="fas fa-star favorite-icon" onclick="toggleFavorite(this, '<%= batch.batch_id %>', '<%= batch.batch_name %>')"></i> <% } %>
+                                    </li>
+                                <% }) %>
+                            <% } %>
+                        </ul>  
+                    </div>
+                </div>
+                <% } %>
+        </div>
+    </main>
+
+    <div class="telegram-float">
+        <p><span>J</span><span>o</span><span>i</span><span>n</span><span> &nbsp;</span><span>u</span><span>s</span></p>
+        <a href="https://t.me/+5fxF6FcmAnJjZmM1" target="_blank">
+            <svg viewBox="0 0 24 24">
+                <path d="M9.94 15.14l-.38 4.1c.54 0 .78-.23 1.06-.5l2.54-2.36 5.28 3.88c.97.54 1.67.26 1.92-.9L24 3.64c.34-1.57-.56-2.22-1.5-1.85L1.57 9.33c-1.52.58-1.5 1.4-.26 1.78l5.6 1.75L19.77 6.5c.65-.42 1.24-.2.75.27z"/>
+            </svg>
+        </a>
+    </div>
+
+    
+    <div class="popup-overlay" id="popup-overlay"></div>
+<div class="popup" id="popup"></div>
+
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Quizard. All Rights Reserved.</p>
+            <div class="social-links">
+                <!-- Add social media icons here -->
+            </div>
+        </div>
+    </footer>
+
+    <script>
+//console.log(<%= isLoggedIn %> )
+        function toggleCategory(element) {
+            // Find the closest category content within this category card
+            const categoryContent = element.closest('.category-card').querySelector('.category-content');
+            
+            // Toggle expanded class
+            categoryContent.classList.toggle('expanded');
+            
+            // Toggle chevron icon
+            const chevronIcon = element.querySelector('i');
+            if (chevronIcon.classList.contains('fa-chevron-down')) {
+                chevronIcon.classList.remove('fa-chevron-down');
+                chevronIcon.classList.add('fa-chevron-up');
+            } else {
+                chevronIcon.classList.remove('fa-chevron-up');
+                chevronIcon.classList.add('fa-chevron-down');
+            }
+        }
+
+
+        function toggleFavorite(element, batchId, batchName) {
+            element.classList.toggle('favorited');
+            
+            fetch('/add-to-fav', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    batchId: batchId,
+                    batchName: batchName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Batch added to favorites successfully');
+                } else {
+                    throw new Error(data.message || 'Failed to update favorite status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+                element.classList.toggle('favorited');
+            });
+        }
+
+        // Search functionality (similar to previous implementation)
+        document.addEventListener('DOMContentLoaded', function () {
+
+            fetch('/adds-update')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showPopup(data.data);
+            } else {
+                throw new Error('Failed to fetch update data');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+          // Handle Telegram float text animation
+    const telegramFloat = document.querySelector('.telegram-float p');
+    telegramFloat.innerHTML = telegramFloat.textContent.split('').map((char, index) => 
+        `<span style="--i:${index}">${char}</span>`
+    ).join('');  
+            
+    const searchInput = document.getElementById('batch-search');
+    const searchResults = document.getElementById('search-results');
+
+    // Collect all batches from the page
+    const allBatches = [];
+    document.querySelectorAll('.category-card').forEach(categoryCard => {
+        const categoryName = categoryCard.querySelector('.category-title').textContent.trim();
+        categoryCard.querySelectorAll('.batch-item').forEach(batchItem => {
+            const batchLink = batchItem.querySelector('.batch-link');
+            const batchName = batchLink.textContent.trim();
+            const batchHref = batchLink.getAttribute('href');
+            const favoriteIcon = batchItem.querySelector('.favorite-icon');
+            const batchId = favoriteIcon ? favoriteIcon.getAttribute('onclick')?.match(/'([^']+)'/)?.[1] : null;
+
+            allBatches.push({
+                name: batchName,
+                category: categoryName,
+                href: batchHref,
+                id: batchId,
+            });
+        });
+    });
+
+    // Add search functionality
+    searchInput.addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase().trim();
+
+        if (searchTerm === '') {
+    searchResults.classList.remove('visible');
+    setTimeout(() => {
+        searchResults.style.display = 'none';
+        searchResults.innerHTML = '';
+    }, 300);
+    return;
+}
+
+// When showing results
+searchResults.style.display = 'block';
+requestAnimationFrame(() => {
+    searchResults.classList.add('visible');
+});
+
+        const filteredBatches = allBatches.filter(batch =>
+            batch.name.toLowerCase().includes(searchTerm) ||
+            batch.category.toLowerCase().includes(searchTerm)
+        );
+
+        if (filteredBatches.length > 0) {
+            searchResults.innerHTML = `
+                <h3>Search Results (${filteredBatches.length} batch${filteredBatches.length !== 1 ? 'es' : ''})</h3>
+                <ul class="search-results-list">
+                    ${filteredBatches.map(batch => `
+                        <li class="search-result-item">
+                            <a href="${batch.href}" class="search-result-link">
+                                <div class="search-result-content">
+                                    <span class="batch-name">${batch.name}</span>
+                                    <span class="search-result-category">${batch.category}</span>
+                                </div>
+                            </a>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+            searchResults.style.display = 'block';
+        } else {
+            searchResults.innerHTML = `
+                <div id="no-results">
+                    <h3>No batches found</h3>
+                    <p>Try a different search term</p>
+                </div>
+            `;
+            searchResults.style.display = 'block';
+        }
+    });
+});
+function toggleMobileMenu() {
+    const mobileDropdown = document.getElementById('mobile-dropdown');
+    if (mobileDropdown.style.display === 'block') {
+        mobileDropdown.classList.remove('visible');
+        setTimeout(() => {
+            mobileDropdown.style.display = 'none';
+        }, 300);
+    } else {
+        mobileDropdown.style.display = 'block';
+        requestAnimationFrame(() => {
+            mobileDropdown.classList.add('visible');
+        });
+    }
+}
+
+        // Add click outside to close mobile menu
+        document.addEventListener('click', function(event) {
+            const mobileDropdown = document.getElementById('mobile-dropdown');
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+
+            if (mobileDropdown.style.display === 'block' && 
+                !mobileDropdown.contains(event.target) && 
+                !mobileMenuToggle.contains(event.target)) {
+                mobileDropdown.style.display = 'none';
+            }
+        });
+
+        function showPopup(content) {
+    const popup = document.getElementById('popup');
+    popup.innerHTML = `
+    <div onclick="closePopup()">
+        <h3>Update Information</h3>
+        <div>${content}</div>
+        </div>
+        <button onclick="closePopup()">Close</button>
+        
+    `;
+    document.getElementById('popup-overlay').style.display = 'block';
+    popup.style.display = 'block';
+    document.body.classList.add('no-scroll'); // Disable background scrolling
+}
+
+// Close popup
+function closePopup() {
+    document.getElementById('popup-overlay').style.display = 'none';
+    document.getElementById('popup').style.display = 'none';
+    document.body.classList.remove('no-scroll'); // Re-enable background scrolling
+}
+
+// Add click event listener to popup overlay for closing
+document.getElementById('popup-overlay').addEventListener('click', closePopup);
+        
+        </script>
+</body>
+</html>

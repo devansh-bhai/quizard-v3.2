@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Maintenance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+        }
+
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            p {
+                font-size: 0.9rem;
+            }
+
+            .icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .countdown {
+                font-size: 1rem;
+            }
+        }
+         /* ... (keep the same CSS as before) ... */
+         .waiting-message {
+            color: #FFA500;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+       
+
+<body>
+    <div class="container">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <h1>Under Maintenance</h1>
+        <p>We're currently updating our website to bring you a better experience. Please check back soon!</p>
+        <div class="countdown" id="countdown"></div>
+        <p id="status-message">We'll be back online at the time shown above. Thank you for your patience!</p>
+        <div id="waiting-message" class="waiting-message" style="display: none;">
+            Waiting for admin to switch on the server. Please check back soon.
+        </div>
+    </div>
+
+    <script>
+        // Receive end_date, end_time, and is_unser_maintainece from the server
+        const endDate = "<%= end_date %>";
+        const endTime = "<%= end_time %>";
+        const isUnderMaintenance = <%= is_unser_maintainece %>;
+
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const statusMessage = document.getElementById('status-message');
+            const waitingMessage = document.getElementById('waiting-message');
+            const [day, month, year] = endDate.split('/');
+            const [hours, minutes, seconds] = endTime.split(':');
+            const targetDate = new Date(year, month - 1, day, hours, minutes, seconds);
+
+            function formatNumber(number) {
+                return number.toString().padStart(2, '0');
+            }
+
+            function updateDisplay() {
+                const now = new Date();
+                const timeDifference = targetDate - now;
+
+                if (timeDifference > 0) {
+                    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+                    countdownElement.textContent = `Date: ${endDate}\nTime: ${endTime}\nCountdown: ${formatNumber(days)}d ${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s`;
+                    statusMessage.style.display = 'block';
+                    waitingMessage.style.display = 'none';
+                } else {
+                    countdownElement.textContent = 'Maintenance period has ended.';
+                    statusMessage.style.display = 'none';
+                    
+                    if (isUnderMaintenance) {
+                        waitingMessage.style.display = 'block';
+                    } else {
+                        waitingMessage.style.display = 'none';
+                        statusMessage.textContent = 'Maintenance complete! Refreshing...';
+                        statusMessage.style.display = 'block';
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    }
+                }
+            }
+
+            updateDisplay();
+            setInterval(updateDisplay, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', updateCountdown);
+    </script>
+</body>
+</html>

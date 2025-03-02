@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Test Series for Batch <%= batch_name %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+        }
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .grid-item {
+            background: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            flex: 1 1 calc(33.333% - 40px);
+            box-sizing: border-box;
+            transition: box-shadow 0.3s;
+            justify-content: center;
+            display: inline-grid;
+            border-radius: 10px;
+        }
+        .grid-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .grid-item h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .grid-item p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            margin-top: 10px;
+        }
+        .button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+            margin: 8px;
+        }
+        .icon {
+            margin-right: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        #instructionsModal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            position: relative;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            position: absolute;
+            top: calc(50% + 40px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        body.loading {
+            overflow: hidden;
+        }
+        body.loading > *:not(.loader-container) {
+            filter: blur(5px);
+        }
+        
+         .info-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .info-item i {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .info-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1 style="text-align: center;">Available Test Series for Batch <%= batch_name %></h1>
+        <div class="grid">
+            <% test_series.forEach(series => { %>
+                <div class="grid-item">
+                    <h2><%= series['test_name'] %></h2>
+                    <div class="info-container">
+                        <div class="info-item">
+                            <i class="far fa-file-alt icon"></i>
+                            <span>Questions: <%= series['questions_count'] %></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="far fa-calendar-alt icon"></i>
+                            <span>Date: <%= series['test_date'] %></span>
+                            
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <button class="button" onclick="startTest('<%= batch_id %>', '<%= series['test_id'] %>')">
+                            <i class="fas fa-play icon"></i>
+                            Start Test
+                        </button>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+    <div class="loader-container" id="global-loader-container">
+        <div class="loader" id="global-loader"></div>
+        <div class="loading-text" id="global-loading-text">Getting data...</div>
+    </div>
+
+    <div id="instructionsModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeInstructions()">&times;</span>
+            <div id="instructionsContent"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-4DEm5V5Sv5T1+q2K1D9meFRze+Rvk8Mx3ad+qP1LkpwNwo8rE0Ad0AsPw6Ae+Rr40NmtcFzJY+6xR0Iq7zIqVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      var _0x4864e4=_0x1ed2;(function(_0xb18bf9,_0x378c92){var _0x49acae=_0x1ed2,_0x2c1b67=_0xb18bf9();while(!![]){try{var _0x41be3d=parseInt(_0x49acae(0x142))/0x1+-parseInt(_0x49acae(0x150))/0x2*(parseInt(_0x49acae(0x139))/0x3)+parseInt(_0x49acae(0x13a))/0x4+-parseInt(_0x49acae(0x137))/0x5+parseInt(_0x49acae(0x13b))/0x6+parseInt(_0x49acae(0x135))/0x7*(-parseInt(_0x49acae(0x143))/0x8)+parseInt(_0x49acae(0x134))/0x9*(parseInt(_0x49acae(0x153))/0xa);if(_0x41be3d===_0x378c92)break;else _0x2c1b67['push'](_0x2c1b67['shift']());}catch(_0x5f4924){_0x2c1b67['push'](_0x2c1b67['shift']());}}}(_0x4be9,0xbe002));function showInstructions(_0x13005b,_0x3d1735){var _0x58835d=_0x1ed2,_0x1244a4=document[_0x58835d(0x136)](_0x58835d(0x14a)),_0x1a04ea=document[_0x58835d(0x140)];_0x1244a4[_0x58835d(0x14e)][_0x58835d(0x138)]='1',_0x1244a4['style'][_0x58835d(0x146)]=_0x58835d(0x14f),_0x1a04ea[_0x58835d(0x156)]['add'](_0x58835d(0x141)),fetch(_0x58835d(0x154)+_0x13005b+'/'+_0x3d1735)[_0x58835d(0x145)](_0x72001c=>_0x72001c['json']())[_0x58835d(0x145)](_0x5c3565=>{var _0xbc5fe4=_0x58835d;document[_0xbc5fe4(0x136)](_0xbc5fe4(0x152))[_0xbc5fe4(0x14b)]=_0x5c3565[_0xbc5fe4(0x133)],document[_0xbc5fe4(0x136)](_0xbc5fe4(0x13e))[_0xbc5fe4(0x14e)]['display']=_0xbc5fe4(0x144),_0x1244a4[_0xbc5fe4(0x14e)]['opacity']='0',_0x1244a4['style'][_0xbc5fe4(0x146)]='hidden',_0x1a04ea['classList'][_0xbc5fe4(0x155)](_0xbc5fe4(0x141));})[_0x58835d(0x13c)](_0x46a6fe=>{var _0x191c2a=_0x58835d;console[_0x191c2a(0x13f)]('Error\x20fetching\x20instructions:',_0x46a6fe),_0x1244a4[_0x191c2a(0x14e)]['opacity']='0',_0x1244a4[_0x191c2a(0x14e)][_0x191c2a(0x146)]=_0x191c2a(0x13d),_0x1a04ea[_0x191c2a(0x156)][_0x191c2a(0x155)](_0x191c2a(0x141));});}function startTest(_0x2d3d1c,_0xd95cfe){var _0x49e23a=_0x1ed2;window[_0x49e23a(0x151)]['href']=_0x49e23a(0x14d)+_0x2d3d1c+'/'+_0xd95cfe;}function _0x1ed2(_0xee3e88,_0x28c73c){var _0x4be950=_0x4be9();return _0x1ed2=function(_0x1ed29,_0x400dd7){_0x1ed29=_0x1ed29-0x133;var _0x497af4=_0x4be950[_0x1ed29];return _0x497af4;},_0x1ed2(_0xee3e88,_0x28c73c);}function closeInstructions(){var _0xb04656=_0x1ed2;document[_0xb04656(0x136)](_0xb04656(0x13e))[_0xb04656(0x14e)][_0xb04656(0x14c)]=_0xb04656(0x147);}function _0x4be9(){var _0x5eb6de=['then','visibility','none','onclick','target','global-loader-container','innerHTML','display','/dpp_test_data/','style','visible','918kGpoKt','location','instructionsContent','20tPzWFU','/instructions/','remove','classList','instructions_html','631917foYtFy','3350389QOxqDs','getElementById','2655660FBYsmI','opacity','5199UMMMBc','4364860aoRGdX','2812962SYOkPp','catch','hidden','instructionsModal','error','body','loading','882980xbubqY','8ykvSMs','block'];_0x4be9=function(){return _0x5eb6de;};return _0x4be9();}window[_0x4864e4(0x148)]=function(_0x510968){var _0x27b074=_0x4864e4,_0x2a33cf=document[_0x27b074(0x136)]('instructionsModal');_0x510968[_0x27b074(0x149)]==_0x2a33cf&&(_0x2a33cf[_0x27b074(0x14e)][_0x27b074(0x14c)]=_0x27b074(0x147));};
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Test Series for Batch <%= batch_name %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        #instructionsModal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #666;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            border-radius: 10px;
+            animation: modalAnimation 0.5s ease-in-out;
+        }
+
+        .close {
+            color: #555;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loader-container.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2563eb;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-wrapper {
+            animation: bounce 0.7s infinite alternate;
+        }
+
+        .loading-text {
+            position: absolute;
+            top: calc(50% + 60px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(-10px); }
+            50% { transform: translateY(0); }
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        body.loading > *:not(.loader-container) {
+            filter: blur(5px);
+        }
+
+        @keyframes modalAnimation {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subject-card {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.5s ease;
+        }
+
+        .subject-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-12 text-gray-900">DPP's Subjects for <%= batch_name %></h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <% subjects.forEach(function(subject, index) { %>
+                <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 transform hover:scale-105 subject-card" data-index="<%= index %>">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-900"><%= subject.subject_name %></h2>
+                    <div class="text-gray-700 mb-4">
+                        <i class="far fa-file-alt mr-2"></i>
+                        Total Chapter's: <%= subject.entries_length %>
+                    </div>
+                    <button
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center hover:bg-blue-700 transition-colors duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                        onclick="startTest('<%= batch_id %>','<%= batch_name %>','<%= subject.subject_slug %>')"
+                    >
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Open
+                    </button>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="instructionsModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-content bg-white rounded-lg shadow-lg p-6">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4 text-gray-900">Instructions</h2>
+            <p class="text-gray-700">Some instructions here...</p>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader-container">
+        <div class="loader-wrapper">
+            <div class="loader"></div>
+        </div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-4DEm5V5Sv5T1+q2K1D9meFRze+Rvk8Mx3ad+qP1LkpwNwo8rE0Ad0AsPw6Ae+Rr40NmtcFzJY+6xR0Iq7zIqVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Previous JavaScript remains the same
+        function showModal() {
+            document.getElementById('instructionsModal').style.display = 'block';
+        }
+
+        var closeBtns = document.getElementsByClassName("close");
+        for (var i = 0; i < closeBtns.length; i++) {
+            closeBtns[i].onclick = function() {
+                document.getElementById('instructionsModal').style.display = 'none';
+            };
+        }
+
+        function showLoader() {
+            console.log('showLoader called');
+            document.body.classList.add('loading');
+            var loaderContainer = document.querySelector('.loader-container');
+            loaderContainer.classList.add('visible');
+        }
+
+        function hideLoader() {
+            console.log('hideLoader called');
+            document.body.classList.remove('loading');
+            var loaderContainer = document.querySelector('.loader-container');
+            loaderContainer.classList.remove('visible');
+        }
+
+        function startTest(batchId, batchName, testId) {
+            showLoader();
+            setTimeout(function() {
+                window.location.href = '/dpp_chp/' + batchId + '/' + batchName + '/' + testId;
+                hideLoader();
+            }, 1000);
+        }
+
+        window.addEventListener('load', function() {
+            var cards = document.querySelectorAll('.subject-card');
+            cards.forEach(function(card, index) {
+                setTimeout(function() {
+                    card.classList.add('animate');
+                }, index * 150);
+            });
+        });
+    </script>
+</body>
+</html>

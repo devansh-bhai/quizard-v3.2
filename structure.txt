@@ -1,0 +1,90 @@
+Folder PATH listing
+Volume serial number is C64C-59B2
+C:.
+|   server.js
+|   structure.txt
+|   update stat.txt
+|   
++---supports
+|   |   fav_batch.js
+|   |   
+|   +---auth
+|   |       login.js
+|   |       signup.js
+|   |       
+|   +---batch_dpp_data
+|   |       chapters.js
+|   |       dpp_chapter_tests.js
+|   |       dpp_test_page.js
+|   |       subjects.js
+|   |       submit_dpp.js
+|   |       
+|   +---batch_test_data
+|   |       batches.js
+|   |       submit_test.js
+|   |       test_data.js
+|   |       
+|   +---check_result
+|   |       check_result.js
+|   |       
+|   +---dashboard
+|   |       admin_dashboard.js
+|   |       dashboard.js
+|   |       
+|   +---DataBase
+|   |       db1.js
+|   |       
+|   +---helper_s
+|   |       time.js
+|   |       
+|   +---landing_page
+|   |       master_landing.js
+|   |       
+|   +---live_test_data
+|   |       calculate_marks.js
+|   |       submit_live_test.js
+|   |       test_page.js
+|   |       validate_test.js
+|   |       
+|   +---middleware_auth
+|   |       auth.js
+|   |       
+|   \---utils
+|           adds.js
+|           del_acc.js
+|           encodeBase64.js
+|           generateResultHtml.js
+|           get_id_info.js
+|           get_subject_name.js
+|           get_topper_data.js
+|           graph_maker.js
+|           instructions.js
+|           test_status.js
+|           time.js
+|           
+\---views
+        admin_dashboard.ejs
+        batch.ejs
+        check-result.ejs
+        dashboard.ejs
+        dpp_batch.ejs
+        dpp_batch_subjects.ejs
+        dpp_chapters.ejs
+        dpp_chapter_entries.ejs
+        dpp_index.ejs
+        graph v1.ejs
+        graph.ejs
+        index.ejs
+        live_test_template.ejs
+        login.ejs
+        master_log_sign.ejs
+        player.ejs
+        signup.ejs
+        test_template.ejs
+        under_maintain.ejs
+        warning.ejs
+        
+
+
+
+command used  :  tree /F /A > structure.txt

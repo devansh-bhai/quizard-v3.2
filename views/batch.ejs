@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Test Series for Batch <%= batch_name %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f4f6f9;
+            --card-background: #ffffff;
+            --text-color-dark: #2c3e50;
+            --text-color-light: #7f8c8d;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+    overflow-y: scroll; /* Force scrollbars always visible */
+}
+
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        /* Loader Styles */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--primary-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            position: absolute;
+            top: calc(50% + 50px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+         body.modal-open {
+    overflow: hidden; /* Prevent scrolling  */
+    padding-right: 17px; /* Adjust for the scrollbar width */
+} 
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        body.loading > *:not(.loader-container) {
+            filter: blur(5px);
+        }
+
+        .instructions-modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            padding-top: 50px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instructions-modal-content {
+            background-color: white;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 70vh;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instructions-modal-header {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            z-index: 10;
+            padding: 15px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .instructions-modal-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .instructions-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--text-color-light);
+            font-size: 30px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 20;
+        }
+
+        .instructions-modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .instructions-modal-body {
+            padding: 20px 30px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .instructions-content {
+            line-height: 1.6;
+            color: var(--text-color-dark);
+        }
+
+        .instructions-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .container {
+            /* width: 100%; */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .home-button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .home-button:hover {
+            color: var(--secondary-color);
+        }
+
+        .home-button i {
+            margin-right: 8px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-color-dark);
+            text-align: center;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 50px 12px 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 30px;
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 6px 8px rgba(46, 204, 113, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .test-card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px var(--shadow-color);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .test-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .test-card-header {
+            margin-bottom: 15px;
+        }
+
+        .test-card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .test-card-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: var(--text-color-light);
+        }
+
+        .test-card-info-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .test-card-info-item i {
+            margin-right: 8px;
+        }
+
+        .test-card-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-instructions {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-start {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--text-color-light);
+            font-size: 1.5rem;
+            margin-top: 50px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+                margin-top: 15px;
+                text-align: left;
+            }
+
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .test-card {
+                padding: 20px;
+            }
+
+            .search-input {
+                padding: 10px 40px 10px 15px;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-close {
+            color: var(--text-color-light);
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="home-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>Home
+            </button>
+            <h1 class="page-title">Available Test Series for Batch <%= batch_name %></h1>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search test series...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="test-grid" id="testSeriesGrid">
+            <% test_series.forEach(series => { %>
+                <div class="test-card">
+                    <div class="test-card-header">
+                        <h2 class="test-card-title"><%= series['test_name'] %></h2>
+                    </div>
+                    <div class="test-card-info">
+                        <div class="test-card-info-item">
+                            <i class="far fa-file-alt"></i>
+                            <span>Questions: <%= series['questions_count'] %></span>
+                        </div>
+                        <div class="test-card-info-item">
+                            <i class="far fa-calendar-alt"></i>
+                            <span>Date: <%= series['test_date'] %></span>
+                        </div>
+                    </div>
+                    <div class="test-card-actions">
+                        <button class="btn btn-instructions" onclick="showInstructions('<%= batch_id %>','<%= series['test_id'] %>')">
+                            <i class="fas fa-info-circle"></i>Instructions
+                        </button>
+                        <button class="btn btn-start" onclick="startTest('<%= batch_id %>', '<%= series['test_id'] %>')">
+                            <i class="fas fa-play"></i>Start Test
+                        </button>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+
+        <div class="no-results" id="noResultsMessage" style="display: none;">
+            No test series found
+        </div>
+    </div>
+
+    <!-- Loader Container -->
+    <div class="loader-container" id="global-loader-container">
+        <div class="loader" id="global-loader"></div>
+        <div class="loading-text" id="global-loading-text">Getting data...</div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructionsModal" class="instructions-modal">
+        <div class="instructions-modal-content">
+            <div class="instructions-modal-header">
+                <h3>Test Instructions</h3>
+                <span class="instructions-modal-close" onclick="closeInstructions()">&times;</span>
+            </div>
+            <div class="instructions-modal-body">
+                <div id="instructionsContent" class="instructions-content"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const type = '<%= type %>';
+        const batchName = '<%= batch_name %>';
+       function showInstructions(batchId, testId) {
+    const body = document.body;
+    const loaderContainer = document.getElementById('global-loader-container');
+    const instructionsModal = document.getElementById('instructionsModal');
+    const instructionsContent = document.getElementById('instructionsContent');
+    document.querySelectorAll(".container").forEach(container => {
+    container.style.maxWidth = "1200px";
+});
+
+
+    // Show loader
+    loaderContainer.style.opacity = '1';
+    loaderContainer.style.visibility = 'visible';
+    body.classList.add('loading');
+
+    fetch('/instructions/' + batchId + '/'+ batchName  +'/' + testId + '/' + type)
+        .then(response => response.json())
+        .then(data => {
+            // Populate and show the modal
+            instructionsContent.innerHTML = data.instructions_html;
+            instructionsModal.style.display = "flex";
+            body.classList.add('modal-open'); // Add modal-open class
+
+            // Hide loader
+            loaderContainer.style.opacity = '0';
+            loaderContainer.style.visibility = 'hidden';
+            body.classList.remove('loading');
+        })
+        .catch(error => {
+            console.error('Error fetching instructions:', error);
+            instructionsContent.innerHTML = '<h3>Error</h3><p>Unable to load instructions. Please try again later.</p>';
+            instructionsModal.style.display = "flex";
+            body.classList.add('modal-open'); // Add modal-open class
+            loaderContainer.style.opacity = '0';
+            loaderContainer.style.visibility = 'hidden';
+            body.classList.remove('loading');
+        });
+}
+
+function closeInstructions() {
+    const body = document.body;
+    const instructionsModal = document.getElementById('instructionsModal');
+    instructionsModal.style.display = "none";
+    body.classList.remove('modal-open'); // Remove modal-open class
+}
+
+
+        
+
+        // Add event listener to close modal when clicking outside
+        document.getElementById('instructionsModal').addEventListener('click', function(event) {
+            // Check if the click was on the modal background (not on the content)
+            if (event.target === this) {
+                closeInstructions();
+            }
+        });
+
+        // Prevent scrolling through content from closing the modal
+        document.querySelector('.instructions-modal-content').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        function startTest(batchId, testId) {
+            window.location.href = '/test_data/' + batchId +'/'+ batchName  + '/' + testId + '/' + type;
+        }
+
+        
+
+        function goBack() {
+            window.history.back();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            var filter = this.value.toLowerCase();
+            var gridItems = document.querySelectorAll('.test-card');
+            var noResultsMessage = document.getElementById('noResultsMessage');
+            var hasResults = false;
+            
+            gridItems.forEach(function(item) {
+                var testName = item.querySelector('.test-card-title').innerText.toLowerCase();
+                var testDate = item.querySelector('.test-card-info-item:last-child span').innerText.toLowerCase();
+                
+                if (testName.includes(filter) || testDate.includes(filter)) {
+                    item.style.display = '';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            noResultsMessage.style.display = hasResults ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>

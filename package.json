@@ -1,0 +1,37 @@
+{
+  "name": "quizard-app",
+  "version": "3.0.0",
+  "description": "An Express.js application for managing quiz batches and tests",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.6",
+    "crypto": "^1.0.1",
+    "ejs": "^3.1.8",
+    "express": "^4.17.1",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.6",
+    "path": "^0.12.7",
+    "node-cron":"3.0.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devansh-bhai/quizard-major-enc.git"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "quiz",
+    "ejs"
+  ],
+  "author": "Dev Boi",
+  "license": "ISC"
+}

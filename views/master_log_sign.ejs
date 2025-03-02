@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication | Quizard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97)',
+                        'spin': 'spin 1s linear infinite',
+                        'scale': 'scale 0.3s ease-out',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translateX(-1px)' },
+                            '20%, 80%': { transform: 'translateX(2px)' },
+                            '30%, 50%, 70%': { transform: 'translateX(-4px)' },
+                            '40%, 60%': { transform: 'translateX(4px)' }
+                        },
+                        spin: {
+                            'to': { transform: 'rotate(360deg)' }
+                        },
+                        scale: {
+                            'from': { transform: 'scale(0)' },
+                            'to': { transform: 'scale(1)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .preserve-3d {
+            transform-style: preserve-3d;
+            perspective: 2000px;
+        }
+        
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        
+        .card-3d {
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .typing-container {
+            display: inline-block;
+            position: relative;
+        }
+
+        .typing-text {
+            border-right: 0.15em solid #ff7eb3;
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 0;
+            letter-spacing: 0.15em;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink {
+            from, to { border-color: transparent }
+            50% { border-color: #ff7eb3 }
+        }
+
+        .input-3d {
+            transform: translateZ(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .input-3d:focus {
+            transform: translateZ(30px) scale(1.02);
+        }
+
+        .button-3d {
+            transform: translateZ(30px);
+            transition: all 0.3s ease;
+        }
+
+        .button-3d:hover {
+            transform: translateZ(40px) scale(1.05);
+        }
+
+        .card-shadow {
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card-shadow:hover {
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Floating animation for background elements */
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-delayed {
+            animation: float 6s ease-in-out infinite;
+            animation-delay: -3s;
+        }
+
+        /* Gradient background with animation */
+        .animated-gradient {
+            background: linear-gradient(
+                45deg,
+                #1a1a2e,
+                #252540,
+                #1a1a2e,
+                #252540
+            );
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-out {
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .preparing-text {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease-out;
+        }
+
+        .preparing-text.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="h-full animated-gradient text-white antialiased">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full floating blur-3xl"></div>
+        <div class="absolute bottom-20 right-20 w-40 h-40 bg-blue-500/10 rounded-full floating-delayed blur-3xl"></div>
+    </div>
+
+    <div class="min-h-[30vh] flex items-center justify-center">
+        <div class="w-full max-w-md">
+            <!-- Welcome Text -->
+            <div class="text-center mb-6">
+                <div class="typing-container">
+                    <h1 id="welcomeText" class="typing-text text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#ff758c] to-[#ff7eb3]">
+                        Welcome to Quizard
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Auth Card Container -->
+            <div class="preserve-3d">
+                <div id="authCard" class="card-3d relative w-full" style="transform-style: preserve-3d;">
+                    <!-- Login Form (Front) -->
+                    <div class="card-front">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/20 card-shadow">
+                            <h2 class="text-2xl font-bold text-center mb-6 transform translate-z-20">Login</h2>
+                            
+                            <form id="loginForm" class="space-y-6">
+                                <div class="space-y-4">
+                                    <input 
+                                        type="text" 
+                                        name="username" 
+                                        placeholder="Username or Email"
+                                        class="input-3d w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#ff7eb3] focus:ring-2 focus:ring-[#ff7eb3]/50"
+                                        required
+                                    >
+                                    <input 
+                                        type="password" 
+                                        name="password" 
+                                        placeholder="Password"
+                                        class="input-3d w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#ff7eb3] focus:ring-2 focus:ring-[#ff7eb3]/50"
+                                        required
+                                    >
+                                </div>
+
+                                <!-- Error Message Container -->
+                                <div class="error-message hidden transform translate-z-20">
+                                    <p class="text-red-300 text-sm text-center"></p>
+                                </div>
+
+                                <button 
+                                    type="submit"
+                                    class="button-3d w-full py-3 px-4 bg-gradient-to-r from-[#ff758c] to-[#ff7eb3] rounded-xl text-white font-medium relative overflow-hidden group"
+                                >
+                                    <span class="relative z-10 flex items-center justify-center gap-2">
+                                        <span class="button-text">Login</span>
+                                        <svg class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </form>
+
+                            <div class="mt-6 text-center">
+                                <button 
+                                    onclick="flipCard()"
+                                    class="text-white/80 hover:text-white transition-colors duration-200 button-3d"
+                                >
+                                    Need an account? Sign Up
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signup Form (Back) -->
+                    <div class="card-back">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/20 card-shadow">
+                            <h2 class="text-2xl font-bold text-center mb-6 transform translate-z-20">Sign Up</h2>
+                            
+                            <form id="signupForm" class="space-y-6">
+                                <div class="space-y-4">
+                                    <input 
+                                        type="text" 
+                                        name="username" 
+                                        placeholder="Username"
+                                        class="input-3d w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#ff7eb3] focus:ring-2 focus:ring-[#ff7eb3]/50"
+                                        required
+                                    >
+                                    <input 
+                                        type="email" 
+                                        name="email" 
+                                        placeholder="Email"
+                                        class="input-3d w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#ff7eb3] focus:ring-2 focus:ring-[#ff7eb3]/50"
+                                        required
+                                    >
+                                    <input 
+                                        type="password" 
+                                        name="password" 
+                                        placeholder="Password"
+                                        class="input-3d w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#ff7eb3] focus:ring-2 focus:ring-[#ff7eb3]/50"
+                                        required
+                                    >
+                                </div>
+
+                                <!-- Error Message Container -->
+                                <div class="error-message hidden transform translate-z-20">
+                                    <p class="text-red-300 text-sm text-center"></p>
+                                </div>
+
+                                <button 
+                                    type="submit"
+                                    class="button-3d w-full py-3 px-4 bg-gradient-to-r from-[#ff758c] to-[#ff7eb3] rounded-xl text-white font-medium relative overflow-hidden group"
+                                >
+                                    <span class="relative z-10 flex items-center justify-center gap-2">
+                                        <span class="button-text">Sign Up</span>
+                                        <svg class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </form>
+
+                            <div class="mt-6 text-center">
+                                <button 
+                                    onclick="flipCard()"
+                                    class="text-white/80 hover:text-white transition-colors duration-200 button-3d"
+                                >
+                                    Already have an account? Login
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Typing Animation with Loop
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeText = document.getElementById('welcomeText');
+            const text = "Welcome to Quizard";
+            let isTyping = true;
+
+            function typeText() {
+                let charIndex = 0;
+                welcomeText.textContent = '';
+                welcomeText.style.width = '0';
+
+                function type() {
+                    if (charIndex < text.length) {
+                        welcomeText.textContent += text.charAt(charIndex);
+                        welcomeText.style.width = `${(charIndex + 1) * 100 / text.length}%`;
+                        charIndex++;
+                        setTimeout(type, 100);
+                    } else {
+                        // Wait for 2 seconds before starting to erase
+                        setTimeout(eraseText, 2000);
+                    }
+                }
+
+                type();
+            }
+
+            function eraseText() {
+                let charIndex = text.length;
+
+                function erase() {
+                    if (charIndex > 0) {
+                        welcomeText.textContent = text.substring(0, charIndex - 1);
+                        welcomeText.style.width = `${(charIndex - 1) * 100 / text.length}%`;
+                        charIndex--;
+                        setTimeout(erase, 50);
+                    } else {
+                        // Wait for 1 second before starting to type again
+                        setTimeout(typeText, 1000);
+                    }
+                }
+
+                erase();
+            }
+
+            // Start the animation loop
+            typeText();
+        });
+
+        // Card Flip
+        let isFlipped = false;
+        function flipCard() {
+            const card = document.getElementById('authCard');
+            isFlipped = !isFlipped;
+            card.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
+        }
+
+        // Updated Form Handling
+        function handleAuth(formId, endpoint) {
+            const form = document.getElementById(formId);
+            const button = form.querySelector('button[type="submit"]');
+            const buttonText = button.querySelector('.button-text');
+            const spinner = button.querySelector('.animate-spin');
+            const errorContainer = form.querySelector('.error-message');
+            const errorText = errorContainer.querySelector('p');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Reset error state
+                errorContainer.classList.add('hidden');
+                
+                // Start loading
+                buttonText.textContent = endpoint === '/login' ? 'Logging in...' : 'Signing up...';
+                spinner.classList.remove('hidden');
+                button.disabled = true;
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(Object.fromEntries(formData))
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        buttonText.textContent = 'Success!';
+                        
+                        // Create and show preparing message
+                        const preparingDiv = document.createElement('div');
+                        preparingDiv.className = 'preparing-text text-center mt-4 text-white/80';
+                        preparingDiv.textContent = 'Preparing your dashboard...';
+                        form.appendChild(preparingDiv);
+                        
+                        // Show the preparing message with animation
+                        setTimeout(() => {
+                            preparingDiv.classList.add('show');
+                        }, 100);
+
+                        // Wait for 2 seconds before redirecting
+                        setTimeout(() => {
+                            window.location.href = endpoint === '/login' ? '/dashboard' : '/login';
+                        }, 2000);
+                    } else {
+                        throw new Error(data.error || data.message || 'An error occurred');
+                    }
+                } catch (error) {
+                    // Reset button
+                    spinner.classList.add('hidden');
+                    buttonText.textContent = endpoint === '/login' ? 'Login' : 'Sign Up';
+                    button.disabled = false;
+
+                    // Show error message
+                    errorText.textContent = error.message;
+                    errorContainer.classList.remove('hidden');
+
+                    // Show error animation
+                    form.classList.add('animate-shake');
+                    setTimeout(() => form.classList.remove('animate-shake'), 500);
+
+                    // Reset password field
+                    form.querySelector('input[type="password"]').value = '';
+                }
+            });
+        }
+
+        // Initialize forms
+        document.addEventListener('DOMContentLoaded', () => {
+            handleAuth('loginForm', '/login');
+            handleAuth('signupForm', '/signup');
+        });
+    </script>
+</body>
+</html>

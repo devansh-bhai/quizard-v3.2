@@ -1,0 +1,32 @@
+
+
+sb done h bs vsercl pr dal kr check kr le kam kr raha ke na 
+
+aur ha uplloders m ha n apne ko ab soluton text , bh dalna h and user html ke saat overall report bh store krna h 
+
+
+
+
+
+map update krna h apna neche wala kal kruga 
+
+code and folders map below ...
+
+Root/
+│-- server.js  (Main entry point)
+│-- views/  (All EJS templates)
+│-- supports/
+│   │-- auth/
+│   │   │-- login.js  (Handles login logic)
+│   │   │-- signup.js  (Handles signup logic)
+│   │
+│   │-- dashboard/
+│   │   │-- dashboard.js  (Handles dashboard rendering & related logic)
+│   │
+│   │-- DataBase/
+│   │   │-- db1.js  (Database connection & utility functions)
+│   │
+│   │-- helpers/
+│   │   │-- time.js  (Contains formatDateTime, getTestStatus, restructureUserRecentTests)
+│   │
+│   │-- fav_batch.js  (Handles adding & removing favorite batches)

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Statistics Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 20px;
+        }
+        .graph-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            border-radius: 12px;
+        }
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+        .overall-stats {
+            margin-bottom: 30px;
+        }
+        .accuracy-badge {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <% if (locals.overallReport) { %>
+        <!-- Overall Report Section -->
+        <div class="graph-container overall-stats">
+            <h2 style="text-align: center; margin-bottom: 20px;">Overall Performance</h2>
+            <div id="overall-container"></div>
+        </div>
+
+        <!-- Section Statistics -->
+        <div class="section-grid">
+            <% if (locals.sections && locals.sections.length > 0) { %>
+                <% sections.forEach((section, index) => { %>
+                    <div class="graph-container" id="container-<%= index %>"></div>
+                <% }); %>
+            <% } %>
+        </div>
+
+        <script>
+            const overallReport = <%- JSON.stringify(locals.overallReport) %>;
+            const sections = <%- JSON.stringify(locals.sections) %>;
+            
+            // Overall Report Visualization
+            const overallContainer = document.getElementById('overall-container');
+            
+            // Create grid layout for overall stats
+            const overallGrid = document.createElement('div');
+            overallGrid.style.display = 'grid';
+            overallGrid.style.gridTemplateColumns = '1fr 1fr';
+            overallGrid.style.gap = '20px';
+            overallContainer.appendChild(overallGrid);
+
+            // Create overall pie chart
+            const overallPieContainer = document.createElement('div');
+            const overallPieCanvas = document.createElement('canvas');
+            overallPieContainer.appendChild(overallPieCanvas);
+            overallGrid.appendChild(overallPieContainer);
+
+            // Create overall stats container
+            const overallStatsContainer = document.createElement('div');
+            overallStatsContainer.style.display = 'flex';
+            overallStatsContainer.style.flexDirection = 'column';
+            overallStatsContainer.style.justifyContent = 'center';
+            overallStatsContainer.style.gap = '15px';
+            overallGrid.appendChild(overallStatsContainer);
+
+            // Create overall pie chart
+            new Chart(overallPieCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correct', 'Wrong', 'Skipped'],
+                    datasets: [{
+                        data: [
+                            overallReport.right,
+                            overallReport.wrong,
+                            overallReport.skipped
+                        ],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#f44336',
+                            '#9e9e9e'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Overall Performance Distribution',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Create overall stats
+            const overallStats = [
+                {
+                    label: 'Total Questions',
+                    value: overallReport.totalQuestions,
+                    color: '#2196F3',
+                    percentage: 100
+                },
+                {
+                    label: 'Attempted Questions',
+                    value: overallReport.attempted,
+                    color: '#673AB7',
+                    percentage: (overallReport.attempted / overallReport.totalQuestions) * 100
+                },
+                {
+                    label: 'Correct Answers',
+                    value: overallReport.right,
+                    color: '#4CAF50',
+                    percentage: (overallReport.right / overallReport.totalQuestions) * 100
+                },
+                {
+                    label: 'Wrong Answers',
+                    value: overallReport.wrong,
+                    color: '#f44336',
+                    percentage: (overallReport.wrong / overallReport.totalQuestions) * 100
+                },
+                {
+                    label: 'Skipped Questions',
+                    value: overallReport.skipped,
+                    color: '#9e9e9e',
+                    percentage: (overallReport.skipped / overallReport.totalQuestions) * 100
+                }
+            ];
+
+            // Add accuracy badge
+            const accuracyBadge = document.createElement('div');
+            accuracyBadge.className = 'accuracy-badge';
+            accuracyBadge.innerHTML = `Accuracy: ${Math.round(overallReport.accuracy)}%`;
+            overallStatsContainer.appendChild(accuracyBadge);
+
+            // Add total marks
+            const overallMarksDiv = document.createElement('div');
+            overallMarksDiv.style.marginTop = '20px';
+            overallMarksDiv.style.padding = '15px';
+            overallMarksDiv.style.backgroundColor = '#f8f9fa';
+            overallMarksDiv.style.borderRadius = '8px';
+            overallMarksDiv.style.textAlign = 'center';
+            overallMarksDiv.innerHTML = `
+                <div style="font-size: 24px; font-weight: bold; color: #2196F3">
+                    ${overallReport.totalMarks}
+                </div>
+                <div style="color: #666">Total Marks</div>
+            `;
+            overallStatsContainer.appendChild(overallMarksDiv);
+
+            overallStats.forEach(stat => {
+                const statDiv = document.createElement('div');
+                statDiv.style.width = '100%';
+
+                // Label and value
+                const labelDiv = document.createElement('div');
+                labelDiv.style.display = 'flex';
+                labelDiv.style.justifyContent = 'space-between';
+                labelDiv.style.marginBottom = '5px';
+                labelDiv.innerHTML = `
+                    <span style="font-weight: bold">${stat.label}</span>
+                    <span>${stat.value} (${Math.round(stat.percentage)}%)</span>
+                `;
+                statDiv.appendChild(labelDiv);
+
+                // Progress bar
+                const progressBar = document.createElement('div');
+                progressBar.style.width = '100%';
+                progressBar.style.height = '10px';
+                progressBar.style.backgroundColor = '#f0f0f0';
+                progressBar.style.borderRadius = '5px';
+                progressBar.style.overflow = 'hidden';
+
+                const progress = document.createElement('div');
+                progress.style.width = `${stat.percentage}%`;
+                progress.style.height = '100%';
+                progress.style.backgroundColor = stat.color;
+                progress.style.transition = 'width 0.5s ease-in-out';
+
+                progressBar.appendChild(progress);
+                statDiv.appendChild(progressBar);
+                overallStatsContainer.appendChild(statDiv);
+            });
+
+            // Section Statistics Visualization
+            if (sections && sections.length > 0) {
+                sections.forEach((sectionStats, index) => {
+                    const container = document.getElementById(`container-${index}`);
+                    
+                    // Create grid layout
+                    const mainDiv = document.createElement('div');
+                    mainDiv.style.display = 'grid';
+                    mainDiv.style.gridTemplateColumns = '1fr';
+                    mainDiv.style.gap = '20px';
+                    container.appendChild(mainDiv);
+
+                    // Create pie chart container
+                    const pieContainer = document.createElement('div');
+                    const pieCanvas = document.createElement('canvas');
+                    pieContainer.appendChild(pieCanvas);
+                    mainDiv.appendChild(pieContainer);
+
+                    // Create stats container
+                    const statsContainer = document.createElement('div');
+                    statsContainer.style.display = 'flex';
+                    statsContainer.style.flexDirection = 'column';
+                    statsContainer.style.gap = '15px';
+                    mainDiv.appendChild(statsContainer);
+
+                    // Create pie chart
+                    new Chart(pieCanvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Correct', 'Wrong', 'Skipped'],
+                            datasets: [{
+                                data: [
+                                    sectionStats.correct_ques,
+                                    sectionStats.wrong_ques,
+                                    sectionStats.skipped_ques
+                                ],
+                                backgroundColor: [
+                                    '#4CAF50',
+                                    '#f44336',
+                                    '#9e9e9e'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: `${sectionStats.name} Section Overview`,
+                                    font: { size: 16, weight: 'bold' }
+                                },
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            },
+                            cutout: '60%'
+                        }
+                    });
+
+                    // Create progress bars and stats
+                    const stats = [
+                        {
+                            label: 'Total Questions',
+                            value: sectionStats.total_ques,
+                            color: '#2196F3',
+                            percentage: 100
+                        },
+                        {
+                            label: 'Correct Answers',
+                            value: sectionStats.correct_ques,
+                            color: '#4CAF50',
+                            percentage: (sectionStats.correct_ques / sectionStats.total_ques) * 100
+                        },
+                        {
+                            label: 'Wrong Answers',
+                            value: sectionStats.wrong_ques,
+                            color: '#f44336',
+                            percentage: (sectionStats.wrong_ques / sectionStats.total_ques) * 100
+                        },
+                        {
+                            label: 'Skipped Questions',
+                            value: sectionStats.skipped_ques,
+                            color: '#9e9e9e',
+                            percentage: (sectionStats.skipped_ques / sectionStats.total_ques) * 100
+                        }
+                    ];
+
+                    stats.forEach(stat => {
+                        const statDiv = document.createElement('div');
+                        statDiv.style.width = '100%';
+
+                        // Label and value
+                        const labelDiv = document.createElement('div');
+                        labelDiv.style.display = 'flex';
+                        labelDiv.style.justifyContent = 'space-between';
+                        labelDiv.style.marginBottom = '5px';
+                        labelDiv.innerHTML = `
+                            <span style="font-weight: bold">${stat.label}</span>
+                            <span>${stat.value} (${Math.round(stat.percentage)}%)</span>
+                        `;
+                        statDiv.appendChild(labelDiv);
+
+                        // Progress bar
+                        const progressBar = document.createElement('div');
+                        progressBar.style.width = '100%';
+                        progressBar.style.height = '10px';
+                        progressBar.style.backgroundColor = '#f0f0f0';
+                        progressBar.style.borderRadius = '5px';
+                        progressBar.style.overflow = 'hidden';
+
+                        const progress = document.createElement('div');
+                        progress.style.width = `${stat.percentage}%`;
+                        progress.style.height = '100%';
+                        progress.style.backgroundColor = stat.color;
+                        progress.style.transition = 'width 0.5s ease-in-out';
+
+                        progressBar.appendChild(progress);
+                        statDiv.appendChild(progressBar);
+                        statsContainer.appendChild(statDiv);
+                    });
+
+                    // Add total marks
+                    const marksDiv = document.createElement('div');
+                    marksDiv.style.marginTop = '20px';
+                    marksDiv.style.padding = '15px';
+                    marksDiv.style.backgroundColor = '#f8f9fa';
+                    marksDiv.style.borderRadius = '8px';
+                    marksDiv.style.textAlign = 'center';
+                    marksDiv.innerHTML = `
+                        <div style="font-size: 24px; font-weight: bold; color: #2196F3">
+                            ${sectionStats.marks}
+                        </div>
+                        <div style="color: #666">Total Marks</div>
+                    `;
+                    statsContainer.appendChild(marksDiv);
+                });
+            }
+        </script>
+    <% } else { %>
+        <div class="graph-container">
+            <div class="no-data">
+                No statistics available. Please submit data using the POST endpoint.
+            </div>
+        </div>
+    <% } %>
+</body>
+</html>

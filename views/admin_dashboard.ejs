@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            background-color: #f3f4f6;
+            min-height: 100vh;
+        }
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .status-ongoing {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .status-ended {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .status-upcoming {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .action-btn {
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            filter: brightness(110%);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Users</h3>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900"><%= totalUsers %></p>
+                </div>
+                
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Test Batches</h3>
+                    <div class="mt-2 space-y-1">
+                        <p class="text-lg font-medium">DPP: <span class="text-blue-600"><%= dppBatches %></span></p>
+                        <p class="text-lg font-medium">Test: <span class="text-blue-600"><%= testBatches %></span></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Live Tests Status</h3>
+                    <div class="mt-2 space-y-1">
+                        <p class="text-lg font-medium">Ongoing: <span class="text-green-600"><%= ongoingTests %></span></p>
+                        <p class="text-lg font-medium">Ended: <span class="text-red-600"><%= endedTests %></span></p>
+                        <p class="text-lg font-medium">Upcoming: <span class="text-blue-600"><%= upcomingTests %></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-5 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Live Tests Overview</h2>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Users Attended</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Answers Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% liveTests.forEach(test => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <%= test.test_name %><br>( <%= test.batch_name %> )
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="status-badge status-<%= test.status.toLowerCase() %>">
+                                        <%= test.status %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <%= test.attendedCount %> users
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if(test.answersUploaded) { %>
+                                        <span class="text-green-600 text-xl">✓</span>
+                                    <% } else { %>
+                                        <span class="text-red-600 text-xl">✗</span>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if(test.status === 'ENDED' && test.answersUploaded) { %>
+                                        <button class="action-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="generateResults('<%= test.batch_id %>','<%= test.test_id %>')">
+                                            Generate Results
+                                        </button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- <script>
+        function generateResults(batchId,testId) {
+            console.log('Generating results for test:',batchId, testId);
+        }
+    </script> -->
+
+    <script>
+        function generateResults(batchId,testId) {
+            fetch(`/generate-test-results/${batchId}/${testId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(`${data.message}\nTotal participants: ${data.totalParticipants}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to generate results');
+            });
+        }
+    </script>
+</body>
+</html>
