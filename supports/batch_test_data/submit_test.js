@@ -338,7 +338,7 @@ const calculateMarks = async (batchId, batch_name, testId, type, userQuestions) 
 // Store recent test result in the user's history
 async function storeRecentTest(userId, batchId, batch_name, test_name, testId, base64ResultHtml, type) {
     try {
-        const usersCollection = getDB('user_db').collection('users'); // Adjust DB name accordingly
+        const usersCollection = getDB('users')
 
         const testTypeKey = type === 'test_series' ? 'test_series' : 'batch_test';
         const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
